@@ -18,6 +18,7 @@ class ElioCanvas {
         this.degreeMode = ElioCanvas.RADIANS;
         this.looping = true;
         this.frameRequest = null;
+        this.intervalRequest = null;
         this.preload = () => { };
         this.setup = () => { };
         this.draw = () => { this.noLoop() };
@@ -27,6 +28,7 @@ class ElioCanvas {
         //default Values
         this.frameCount = 0
         this.startTimestamp = 0
+        this.frameRate = undefined //undefined-> requestAnimation; 
 
         this.color = "#FF56FF"
         this._mouseX = 0
@@ -63,6 +65,7 @@ class ElioCanvas {
 
     get mouseX() { return this._mouseX }
     get mouseY() { return this._mouseY }
+
 
     //COLORING
     background() {
@@ -276,6 +279,7 @@ class ElioCanvas {
     noLoop() {
         this.looping = false;
         cancelAnimationFrame(this.frameRequest);
+        clearInterval(this.intervalRequest);
     }
 
     loop() {
@@ -288,8 +292,14 @@ class ElioCanvas {
             self.ctx.setTransform(1, 0, 0, 1, 0, 0);
             self.frameCount++
 
+            
             if (self.looping) {
-                self.frameRequest = requestAnimationFrame(loop);
+                if(self.frameRate===undefined){
+                    self.frameRequest = requestAnimationFrame(loop);
+                }else{
+                    clearInterval(self.intervalRequest)
+                    self.intervalRequest = setInterval(loop,1000/self.frameRate)
+                }
             }
         }
         loop();
